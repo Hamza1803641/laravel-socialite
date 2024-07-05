@@ -40,15 +40,41 @@ class LoginController extends Controller
     }
 
     //google login
-    public function  redirectToGoogle()
+    public function redirectToGoogle()
     {
-        return Socialite::driver('google')->redirect(); 
+        return Socialite::driver('google')->redirect();
     }
 
     //google callback
 
-    public function  handleGoogleCallback()
+    public function handleGoogleCallback()
     {
-        $user= Socialite::driver('google')->user(); 
+        $user = Socialite::driver('google')->user();
+    }
+
+
+    //google login
+    public function redirectToFacebook()
+    {
+        return Socialite::driver('facebook')->redirect();
+    }
+
+    //Facebook callback
+
+    public function handleFacebookCallback()
+    {
+        $user = Socialite::driver('facebook')->user();
+    }
+    //Github login
+    public function redirectToGithub()
+    {
+        return Socialite::driver('github')->redirect();
+    }
+
+    //Github callback
+
+    public function handleGithubCallback()
+    {
+        $user = Socialite::driver('github')->user();
     }
 }
