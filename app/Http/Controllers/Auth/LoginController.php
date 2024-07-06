@@ -6,95 +6,65 @@ use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
+use App\Models\User; // Make sure to import the User model
 
 class LoginController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Login Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles authenticating users for the application and
-    | redirecting them to your home screen. The controller uses a trait
-    | to conveniently provide its functionality to your applications.
-    |
-    */
-
     use AuthenticatesUsers;
 
-    /**
-     * Where to redirect users after login.
-     *
-     * @var string
-     */
     protected $redirectTo = '/home';
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
         $this->middleware('auth')->only('logout');
     }
 
-    //google login
+    // Google login
     public function redirectToGoogle()
     {
         return Socialite::driver('google')->redirect();
     }
 
-    //google callback
-
+    // Google callback
     public function handleGoogleCallback()
     {
         $user = Socialite::driver('google')->user();
-
-
-        $this->RegisterOrLoginUser($user);
+        $this->registerOrLoginUser($user);
         return redirect()->route('home');
-
     }
 
-
-    //google login
+    // Facebook login
     public function redirectToFacebook()
     {
         return Socialite::driver('facebook')->redirect();
     }
 
-    //Facebook callback
-
+    // Facebook callback
     public function handleFacebookCallback()
     {
         $user = Socialite::driver('facebook')->user();
-
-        
-        $this->RegisterOrLoginUser($user);
+        $this->registerOrLoginUser($user);
         return redirect()->route('home');
     }
-    //Github login
+
+    // GitHub login
     public function redirectToGithub()
     {
         return Socialite::driver('github')->redirect();
     }
 
-    //Github callback
-
+    // GitHub callback
     public function handleGithubCallback()
     {
         $user = Socialite::driver('github')->user();
-
-        
-        $this->RegisterOrLoginUser($user);
+        $this->registerOrLoginUser($user);
         return redirect()->route('home');
     }
 
-    protected function RegisterOrLoginUser($data)
+    protected function registerOrLoginUser($data)
     {
-        $user = User::where('email', '=', $data->email)->first();
+        $user = User::where('email', $data->email)->first();
 
         if (!$user) {
             $user = new User();
@@ -103,11 +73,8 @@ class LoginController extends Controller
             $user->provider_id = $data->id;
             $user->avatar = $data->avatar;
             $user->save();
-
-            Auth::login($user);
-
-
         }
 
+        Auth::login($user);
     }
 }
