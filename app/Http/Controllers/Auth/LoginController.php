@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 
 class LoginController extends Controller
@@ -50,6 +51,11 @@ class LoginController extends Controller
     public function handleGoogleCallback()
     {
         $user = Socialite::driver('google')->user();
+
+
+        $this->RegisterOrLoginUser($user);
+        return redirect()->route('home');
+
     }
 
 
@@ -64,6 +70,10 @@ class LoginController extends Controller
     public function handleFacebookCallback()
     {
         $user = Socialite::driver('facebook')->user();
+
+        
+        $this->RegisterOrLoginUser($user);
+        return redirect()->route('home');
     }
     //Github login
     public function redirectToGithub()
@@ -76,5 +86,28 @@ class LoginController extends Controller
     public function handleGithubCallback()
     {
         $user = Socialite::driver('github')->user();
+
+        
+        $this->RegisterOrLoginUser($user);
+        return redirect()->route('home');
+    }
+
+    protected function RegisterOrLoginUser($data)
+    {
+        $user = User::where('email', '=', $data->email)->first();
+
+        if (!$user) {
+            $user = new User();
+            $user->name = $data->name;
+            $user->email = $data->email;
+            $user->provider_id = $data->id;
+            $user->avatar = $data->avatar;
+            $user->save();
+
+            Auth::login($user);
+
+
+        }
+
     }
 }
